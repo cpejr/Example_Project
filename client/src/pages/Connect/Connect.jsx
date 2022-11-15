@@ -8,7 +8,7 @@ export default function Connect() {
 
   useEffect(() => {
     localStorage.removeItem('roomName');
-  }, []);
+  });
 
   const handleClick = (e) => {
     e.preventDefault();
@@ -16,11 +16,7 @@ export default function Connect() {
     const roomName = roomInput.current.value;
 
     localStorage.setItem('roomName', roomName);
-    navigate('/share-files', {
-      state: {
-        roomName,
-      },
-    });
+    navigate('/share-files');
   };
 
   return (

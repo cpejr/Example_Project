@@ -1,7 +1,6 @@
 import axios from 'axios';
 import toast, { Toaster } from 'react-hot-toast';
 import { useState, useEffect, useContext, useCallback } from 'react';
-import { useLocation } from 'react-router-dom';
 import { uniqueId } from 'lodash';
 import { filesize } from 'filesize';
 import { SocketContext } from '../../context/socket';
@@ -12,7 +11,7 @@ import api from '../../services/api';
 export default function ShareFiles() {
   const [uploadedFiles, setUploadedFiles] = useState([]);
   const socket = useContext(SocketContext);
-  const roomName = useLocation().state?.roomName;
+  const roomName = localStorage.getItem('roomName');
 
   const filesWithBlobUrls = useCallback(async (files) => {
     if (!files.length) return files;
