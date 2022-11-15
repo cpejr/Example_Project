@@ -36,8 +36,8 @@ export const DropContainer = styled.div`
 
 const messageColors = {
   default: '#999',
-  error: '#e57878',
-  success: '#78e5d5',
+  error: 'var(--reject)',
+  success: 'var(--success)',
 };
 
 export const UploadMessage = styled.p`
@@ -58,9 +58,9 @@ const Button = styled.button`
 `;
 
 export const DeleteAll = styled(Button)`
-  background: #bc0000;
+  background: var(--reject);
 `;
 
 export const GetAll = styled(Button)`
-  background: #48a70b;
+  background: var(--success);
 `;

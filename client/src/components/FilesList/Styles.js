@@ -20,9 +20,11 @@ export const Container = styled.ul`
 export const FileInfo = styled.div`
   display: flex;
   align-items: center;
+
   div {
     display: flex;
     flex-direction: column;
+
     span {
       font-size: 12px;
       color: #999;
@@ -30,7 +32,7 @@ export const FileInfo = styled.div`
       button {
         border: 0;
         background: transparent;
-        color: #e57878;
+        color: var(--reject);
         margin-left: 5px;
         cursor: pointer;
       }

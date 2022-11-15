@@ -10,10 +10,17 @@ function FilesList({ files, onDelete }) {
       {files.map((file) => (
         <li key={file.id}>
           <FileInfo>
-            {file.type.includes('image') ? (
+            {file.type?.includes('image') ? (
               <Preview src={file.preview} />
             ) : (
-              <TfiFiles size={36} style={{ marginRight: '10px' }} />
+              <TfiFiles
+                size={36}
+                style={{
+                  marginRight: '10px',
+                  minWidth: '36px',
+                  minHeight: '36px',
+                }}
+              />
             )}
             <div>
               <strong>{file.name}</strong>
