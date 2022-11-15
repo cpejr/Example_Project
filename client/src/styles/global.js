@@ -3,7 +3,7 @@ import 'react-circular-progressbar/dist/styles.css';
 
 export default createGlobalStyle`
 :root {
-  --primary: #FFD100
+  --primary: #7159c1
 }
 
 * {

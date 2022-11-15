@@ -10,7 +10,9 @@ export const create = async (req, res, next) => {
       location: url = '',
     } = req[multerFileName];
 
-    const file = await FileModel.create({ name, size, key, url });
+    const formatedName = Buffer.from(name, 'latin1').toString('utf8');
+
+    const file = await FileModel.create({ name: formatedName, size, key, url });
     return res.status(200).json(file);
   } catch (err) {
     next(err);

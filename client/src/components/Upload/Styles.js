@@ -48,11 +48,19 @@ export const UploadMessage = styled.p`
   padding: 15px 0;
 `;
 
-export const DeleteAll = styled.button`
+const Button = styled.button`
   color: white;
-  background: var(--primary);
   border: none;
+  cursor: pointer;
 
-  padding: 10px;
+  padding: 8px;
   border-radius: 4px;
+`;
+
+export const DeleteAll = styled(Button)`
+  background: #bc0000;
+`;
+
+export const GetAll = styled(Button)`
+  background: #48a70b;
 `;

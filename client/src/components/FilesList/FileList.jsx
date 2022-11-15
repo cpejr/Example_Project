@@ -1,5 +1,6 @@
 import { CircularProgressbar } from 'react-circular-progressbar';
 import { MdCheckCircle, MdError, MdLink } from 'react-icons/md';
+import { TfiFiles } from 'react-icons/tfi';
 import { Container, FileInfo, Preview } from './Styles';
 
 function FilesList({ files, onDelete }) {
@@ -9,7 +10,11 @@ function FilesList({ files, onDelete }) {
       {files.map((file) => (
         <li key={file.id}>
           <FileInfo>
-            <Preview src={file.preview} />
+            {file.type.includes('image') ? (
+              <Preview src={file.preview} />
+            ) : (
+              <TfiFiles size={36} style={{ marginRight: '10px' }} />
+            )}
             <div>
               <strong>{file.name}</strong>
               <span>
@@ -35,11 +40,7 @@ function FilesList({ files, onDelete }) {
               />
             )}
             {file.url && (
-              <a
-                href="https://doctorappweb.s3.sa-east-1.amazonaws.com/357cad5fabb796b94b35d27bd06b094e-img1.png"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
+              <a href={file.url} target="_blank" rel="noopener noreferrer">
                 <MdLink
                   style={{ marginRight: 8 }}
                   size={iconsSize}

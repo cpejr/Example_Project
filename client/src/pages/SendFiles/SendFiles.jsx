@@ -1,3 +1,4 @@
+import axios from 'axios';
 import { useState, useCallback } from 'react';
 import { uniqueId } from 'lodash';
 import { filesize } from 'filesize';
@@ -51,6 +52,50 @@ export default function SendFiles() {
     [updateFile]
   );
 
+  const filesWithBlobUrls = async (files) => {
+    const requests = files.map(({ url }) =>
+      axios(url, { responseType: 'blob' })
+    );
+
+    const responses = await Promise.all(requests);
+    return files.map((file, i) => {
+      const blob = responses[i].data;
+      const { type } = blob;
+
+      return {
+        ...file,
+        preview: URL.createObjectURL(blob),
+        type,
+      };
+    });
+  };
+
+  const handleGetAll = useCallback(() => {
+    api
+      .get('/files')
+      .then(async (res) => {
+        const files = await filesWithBlobUrls(res.data);
+        const filesData = files.map((file) => ({
+          file,
+          // eslint-disable-next-line no-underscore-dangle
+          id: file._id,
+          type: file.type,
+          name: file.name,
+          readableSize: filesize(file.size),
+          preview: file.preview,
+          progress: 100,
+          uploaded: true,
+          error: false,
+          url: file.url,
+        }));
+        setUploadedFiles(filesData);
+        console.log('Arquivos recuperados com sucesso!');
+      })
+      .catch((err) =>
+        console.error(`Erro ao recuperar todos os arquivos:\n${err}`)
+      );
+  }, []);
+
   const handleDeleteAll = useCallback(async () => {
     api
       .delete('/files')
@@ -81,6 +126,7 @@ export default function SendFiles() {
     const filesData = files.map((file) => ({
       file,
       id: uniqueId(),
+      type: file.type,
       name: file.name,
       readableSize: filesize(file.size),
       preview: URL.createObjectURL(file),
@@ -89,7 +135,6 @@ export default function SendFiles() {
       error: false,
       url: null,
     }));
-
     setUploadedFiles((prev) => prev.concat(filesData));
 
     filesData.forEach(processUpload);
@@ -98,7 +143,11 @@ export default function SendFiles() {
   return (
     <Container>
       <Content>
-        <Upload onUpload={handleUpload} onDeleteAll={handleDeleteAll} />
+        <Upload
+          onUpload={handleUpload}
+          onDeleteAll={handleDeleteAll}
+          onGetAll={handleGetAll}
+        />
         {!!uploadedFiles.length && (
           <FileList files={uploadedFiles} onDelete={handleDelete} />
         )}
