@@ -46,14 +46,16 @@ export const FormInput = styled.div`
 `;
 
 export const Button = styled.div`
-  background: var(--success);
-  text-align: center;
   max-width: 200px;
   margin-top: 15px;
   padding: 10px 20px;
+
+  text-align: center;
   font-size: 18px;
-  border-radius: 20px;
   color: #fff;
+
+  background: var(--success);
+  border-radius: 20px;
   border: none;
   outline: none;
   cursor: pointer;
