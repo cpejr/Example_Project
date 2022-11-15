@@ -1,10 +1,13 @@
+import { fileURLToPath } from 'url';
 import mongoose from 'mongoose';
 import { DeleteObjectCommand } from '@aws-sdk/client-s3';
 import fs from 'node:fs';
 import path from 'node:path';
 import { promisify } from 'node:util';
 import storageS3Client from '../config/storageS3Client.js';
-import __dirname from '../utils/dirname.js';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const FileSchema = new mongoose.Schema(
   {

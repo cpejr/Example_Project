@@ -1,3 +1,4 @@
+import { fileURLToPath } from 'url';
 import path from 'node:path';
 import express from 'express';
 import cors from 'cors';
@@ -5,7 +6,9 @@ import morgan from 'morgan';
 import helmet from 'helmet';
 import errorHandling from './utils/errorHandling.js';
 import FilesRoutes from './routes/FilesRoutes.js';
-import __dirname from './utils/dirname.js';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // Inicializando instância do servidor express
 const app = express();

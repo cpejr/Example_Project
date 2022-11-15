@@ -8,7 +8,7 @@ import { SendFiles } from './pages';
 
 const router = createBrowserRouter(
   createRoutesFromElements(
-    <Route path="/">
+    <Route path="/app">
       <Route index element={<SendFiles />} />
     </Route>
   )

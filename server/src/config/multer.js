@@ -1,9 +1,12 @@
+import { fileURLToPath } from 'url';
 import path from 'node:path';
 import crtypto from 'node:crypto';
 import multer from 'multer';
 import multerS3 from 'multer-s3';
 import storageS3Client from './storageS3Client.js';
-import __dirname from '../utils/dirname.js';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const storageTypes = {
   local: multer.diskStorage({
