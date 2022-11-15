@@ -3,13 +3,11 @@ import { io } from 'socket.io-client';
 
 export const SocketContext = createContext();
 
-const BACK_END_URL = 'http://localhost:3333';
-
 export function SocketContextProvider({ children }) {
   const [socket, setSocket] = useState();
 
   useEffect(() => {
-    const newSocket = io(BACK_END_URL);
+    const newSocket = io();
 
     setSocket(newSocket);
     return () => {
