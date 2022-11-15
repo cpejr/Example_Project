@@ -48,6 +48,7 @@ export default function ShareFiles() {
   }, [socket, roomName]);
 
   const filesWithBlobUrls = useCallback(async (files) => {
+    if (!files.length) return files;
     const requests = files.map(({ url }) =>
       axios(url, { responseType: 'blob' })
     );
@@ -65,15 +66,10 @@ export default function ShareFiles() {
     });
   }, []);
 
-  const handleGetAll = useCallback(() => {
-    const request = toast.promise(api.get('/files'), {
-      loading: 'Recuperando arquivos',
-      success: 'Arquivos recuperados com sucesso!',
-      error: 'Ocorreu um problema ao recuperar os arquivos',
-    });
-
-    request
-      .then(async (res) => {
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const res = await api.get(`/files?roomName=${roomName}`);
         const files = await filesWithBlobUrls(res.data);
         const filesData = files.map((file) => ({
           file,
@@ -89,14 +85,17 @@ export default function ShareFiles() {
           url: file.url,
         }));
         setUploadedFiles(filesData);
-      })
-      .catch((err) => {
+      } catch (err) {
         console.error(err);
-      });
-  }, [filesWithBlobUrls]);
+        toast.error('Algo deu errado ao capturar os arquivos.');
+      }
+    };
+
+    fetchData();
+  }, [filesWithBlobUrls, roomName]);
 
   const handleDeleteAll = useCallback(async () => {
-    return toast.promise(api.delete('/files'), {
+    return toast.promise(api.delete(`/files?roomName=${roomName}`), {
       loading: 'Deletando arquivos',
       success: () => {
         setUploadedFiles([]);
@@ -105,7 +104,7 @@ export default function ShareFiles() {
       },
       error: 'Ocorreu uma falha ao tentar excluir todos os arquivos',
     });
-  }, []);
+  }, [socket, roomName]);
 
   const handleDelete = useCallback(
     async (id) => {
@@ -136,7 +135,7 @@ export default function ShareFiles() {
       }
 
       api
-        .post('/files', data, {
+        .post(`/files?roomName=${roomName}`, data, {
           onUploadProgress: ({ loaded, total }) => {
             const progress = Math.round((loaded * 100) / total);
             updateFile(uploadedFile.id, { progress });
@@ -152,9 +151,9 @@ export default function ShareFiles() {
           });
           socket.emit('send-file', {
             ...uploadedFile,
-            // eslint-disable-next-line no-underscore-dangle
             uploaded: true,
             progress: 100,
+            // eslint-disable-next-line no-underscore-dangle
             id: response.data._id,
             url: response.data.url,
           });
@@ -167,7 +166,7 @@ export default function ShareFiles() {
           });
         });
     },
-    [updateFile, socket]
+    [updateFile, socket, roomName]
   );
 
   const handleUpload = useCallback(
@@ -194,11 +193,7 @@ export default function ShareFiles() {
   return (
     <Container>
       <Content>
-        <Upload
-          onUpload={handleUpload}
-          onDeleteAll={handleDeleteAll}
-          onGetAll={handleGetAll}
-        />
+        <Upload onUpload={handleUpload} onDeleteAll={handleDeleteAll} />
         {!!uploadedFiles.length && (
           <FileList files={uploadedFiles} onDelete={handleDelete} />
         )}

@@ -11,8 +11,15 @@ export const create = async (req, res, next) => {
     } = req[multerFileName];
 
     const formatedName = Buffer.from(name, 'latin1').toString('utf8');
+    const { roomName } = req.query;
 
-    const file = await FileModel.create({ name: formatedName, size, key, url });
+    const file = await FileModel.create({
+      name: formatedName,
+      size,
+      key,
+      url,
+      roomName,
+    });
     return res.status(200).json(file);
   } catch (err) {
     next(err);
@@ -21,7 +28,9 @@ export const create = async (req, res, next) => {
 
 export const getAll = async (req, res, next) => {
   try {
-    const files = await FileModel.find({}).exec();
+    const { roomName } = req.query;
+    const filter = roomName ? { roomName } : {};
+    const files = await FileModel.find(filter).exec();
     return res.status(200).json(files);
   } catch (err) {
     next(err);
@@ -30,7 +39,9 @@ export const getAll = async (req, res, next) => {
 
 export const deleteAll = async (req, res, next) => {
   try {
-    const files = await FileModel.deleteAll();
+    const { roomName } = req.query;
+    const filter = roomName ? { roomName } : {};
+    const files = await FileModel.deleteAll(filter);
 
     return res.status(200).json(files);
   } catch (err) {

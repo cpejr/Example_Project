@@ -11,6 +11,7 @@ const __dirname = path.dirname(__filename);
 
 const FileSchema = new mongoose.Schema(
   {
+    roomName: String,
     name: {
       type: String,
       required: true,
@@ -48,8 +49,8 @@ FileSchema.pre('remove', async function () {
   return promisifiedUnlink(pathToFile);
 });
 
-FileSchema.statics.deleteAll = async function () {
-  const files = await this.find({}).exec();
+FileSchema.statics.deleteAll = async function (filter) {
+  const files = await this.find(filter).exec();
 
   files.forEach(async ({ key }) => {
     const storageType = process.env.STORAGE_TYPE;
@@ -63,7 +64,7 @@ FileSchema.statics.deleteAll = async function () {
     }
   });
 
-  await this.deleteMany({}).exec();
+  await this.deleteMany(filter).exec();
   return files;
 };
 

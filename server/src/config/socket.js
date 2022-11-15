@@ -21,12 +21,12 @@ export default function socketConfig(app) {
 
     socket.on('leave-room', () => {
       console.log(`Socket with id ${socket.id} left room ${socket.room}`);
+      socket.leave(socket.room);
       delete socket.room;
     });
 
     socket.on('send-file', (file) => {
       socket.broadcast.to(socket.room).emit('receive-file', file);
-      console.log(file);
       console.log(
         `Socket with id ${socket.id} sended a file to room ${socket.room}`
       );

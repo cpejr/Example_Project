@@ -48,19 +48,15 @@ export const UploadMessage = styled.p`
   padding: 15px 0;
 `;
 
-const Button = styled.button`
+export const DeleteAll = styled.button`
+  background: var(--reject);
+
+  text-weight: 600;
+
   color: white;
   border: none;
   cursor: pointer;
 
   padding: 8px;
   border-radius: 4px;
-`;
-
-export const DeleteAll = styled(Button)`
-  background: var(--reject);
-`;
-
-export const GetAll = styled(Button)`
-  background: var(--success);
 `;

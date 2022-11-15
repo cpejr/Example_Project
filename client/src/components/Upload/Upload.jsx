@@ -1,14 +1,8 @@
 import { useMemo } from 'react';
 import { useDropzone } from 'react-dropzone';
-import {
-  Container,
-  DropContainer,
-  UploadMessage,
-  DeleteAll,
-  GetAll,
-} from './Styles';
+import { Container, DropContainer, UploadMessage, DeleteAll } from './Styles';
 
-export default function Upload({ onUpload, onDeleteAll, onGetAll }) {
+export default function Upload({ onUpload, onDeleteAll }) {
   const renderDragMessage = (isDragAccept, isDragReject) => {
     if (isDragAccept) {
       return (
@@ -47,9 +41,6 @@ export default function Upload({ onUpload, onDeleteAll, onGetAll }) {
         <input {...getInputProps()} />
         {inputMessage}
       </DropContainer>
-      <GetAll type="button" onClick={onGetAll}>
-        Recuperar armazenamento
-      </GetAll>
       <DeleteAll type="button" onClick={onDeleteAll}>
         Apagar armazenamento
       </DeleteAll>
