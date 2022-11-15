@@ -12,9 +12,7 @@ import api from '../../services/api';
 export default function ShareFiles() {
   const [uploadedFiles, setUploadedFiles] = useState([]);
   const socket = useContext(SocketContext);
-  const {
-    state: { roomName },
-  } = useLocation();
+  const roomName = useLocation().state?.roomName;
 
   const filesWithBlobUrls = useCallback(async (files) => {
     if (!files.length) return files;
@@ -36,7 +34,7 @@ export default function ShareFiles() {
   }, []);
 
   useEffect(() => {
-    if (!socket) return;
+    if (!socket || !roomName) return;
 
     socket.emit('join-room', roomName);
 
@@ -67,6 +65,7 @@ export default function ShareFiles() {
   }, [socket, roomName]);
 
   useEffect(() => {
+    if (!roomName) return;
     const fetchData = async () => {
       try {
         const res = await api.get(`/files?roomName=${roomName}`);

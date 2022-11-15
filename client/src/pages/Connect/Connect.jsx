@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Container, FormContainer, FormInput, Button } from './Styles';
 
@@ -6,10 +6,16 @@ export default function Connect() {
   const roomInput = useRef();
   const navigate = useNavigate();
 
+  useEffect(() => {
+    localStorage.removeItem('roomName');
+  }, []);
+
   const handleClick = (e) => {
     e.preventDefault();
 
     const roomName = roomInput.current.value;
+
+    localStorage.setItem('roomName', roomName);
     navigate('/share-files', {
       state: {
         roomName,
