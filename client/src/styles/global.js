@@ -2,6 +2,10 @@ import { createGlobalStyle } from 'styled-components';
 import 'react-circular-progressbar/dist/styles.css';
 
 export default createGlobalStyle`
+:root {
+  --primary: #FFD100
+}
+
 * {
   margin: 0;
   padding: 0;
@@ -12,7 +16,7 @@ export default createGlobalStyle`
 body {
   font-family: Arial, Helvetica, sans-serif;
   font-size: 14px;
-  background: #7159c1;
+  background: var(--primary);
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
 }

@@ -50,7 +50,8 @@ export const UploadMessage = styled.p`
 
 export const DeleteAll = styled.button`
   color: white;
-  background: #7159c1;
+  background: var(--primary);
+  border: none;
 
   padding: 10px;
   border-radius: 4px;
