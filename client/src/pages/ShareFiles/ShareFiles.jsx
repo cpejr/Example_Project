@@ -16,6 +16,25 @@ export default function ShareFiles() {
     state: { roomName },
   } = useLocation();
 
+  const filesWithBlobUrls = useCallback(async (files) => {
+    if (!files.length) return files;
+    const requests = files.map(({ url }) =>
+      axios(url, { responseType: 'blob' })
+    );
+
+    const responses = await Promise.all(requests);
+    return files.map((file, i) => {
+      const blob = responses[i].data;
+      const { type } = blob;
+
+      return {
+        ...file,
+        preview: URL.createObjectURL(blob),
+        type,
+      };
+    });
+  }, []);
+
   useEffect(() => {
     if (!socket) return;
 
@@ -46,25 +65,6 @@ export default function ShareFiles() {
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [socket, roomName]);
-
-  const filesWithBlobUrls = useCallback(async (files) => {
-    if (!files.length) return files;
-    const requests = files.map(({ url }) =>
-      axios(url, { responseType: 'blob' })
-    );
-
-    const responses = await Promise.all(requests);
-    return files.map((file, i) => {
-      const blob = responses[i].data;
-      const { type } = blob;
-
-      return {
-        ...file,
-        preview: URL.createObjectURL(blob),
-        type,
-      };
-    });
-  }, []);
 
   useEffect(() => {
     const fetchData = async () => {
