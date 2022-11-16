@@ -39,10 +39,13 @@ export default function ShareFiles() {
 
     socket.on('receive-file', (file) => {
       const index = uploadedFiles.findIndex(({ id }) => id === file.id);
-      if (index === -1) {
-        setUploadedFiles((prev) => [...prev, file]);
-        toast('Enviaram um arquivo');
-      }
+
+      if (index !== -1) return;
+
+      const blob = new Blob([file.file], { type: file.type });
+      const preview = URL.createObjectURL(blob);
+      setUploadedFiles((prev) => [...prev, { ...file, preview }]);
+      toast('Enviaram um arquivo');
     });
 
     socket.on('delete-file', (id) => {
@@ -83,13 +86,21 @@ export default function ShareFiles() {
           url: file.url,
         }));
         setUploadedFiles(filesData);
+        return { files: filesData };
       } catch (err) {
         console.error(err);
-        toast.error('Algo deu errado ao capturar os arquivos.');
+        return err;
       }
     };
 
-    fetchData();
+    toast.promise(fetchData(), {
+      loading: 'Carregando arquivos do armazenamento',
+      success: ({ files }) =>
+        files.length
+          ? 'Arquivos carregados com sucesso'
+          : 'Sem arquivos armazenados',
+      error: 'Ocorreu um erro ao carregar os arquivos',
+    });
   }, [filesWithBlobUrls, roomName]);
 
   const handleDeleteAll = useCallback(async () => {
