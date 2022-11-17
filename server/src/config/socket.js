@@ -32,13 +32,19 @@ export default function socketConfig(app) {
       );
     });
 
-    socket.on('delete-file', (id) =>
-      socket.broadcast.to(socket.room).emit('delete-file', id)
-    );
+    socket.on('delete-file', (id) => {
+      console.log(
+        `Socket with id ${socket.id} deleted a file from room ${socket.room}`
+      );
+      socket.broadcast.to(socket.room).emit('delete-file', id);
+    });
 
-    socket.on('delete-all-files', () =>
-      socket.broadcast.to(socket.room).emit('delete-all-files')
-    );
+    socket.on('delete-all-files', () => {
+      console.log(
+        `Socket with id ${socket.id} deleted all files from room ${socket.room}`
+      );
+      socket.broadcast.to(socket.room).emit('delete-all-files');
+    });
   });
 
   return server;
