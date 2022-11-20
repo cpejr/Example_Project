@@ -17,7 +17,7 @@ const router = createBrowserRouter(
   createRoutesFromElements(
     <Route path="/">
       <Route index element={<Connect />} />
-      <Route path="/share-files" element={<ProtectedRoute />}>
+      <Route path="share-files" element={<ProtectedRoute />}>
         <Route index element={<ShareFiles />} />
       </Route>
     </Route>

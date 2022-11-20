@@ -1,17 +1,24 @@
 import axios from 'axios';
+import { io } from 'socket.io-client';
 import toast, { Toaster } from 'react-hot-toast';
-import { useState, useEffect, useContext, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { uniqueId } from 'lodash';
 import { filesize } from 'filesize';
-import { SocketContext } from '../../context/socket';
 import { Upload, FileList } from '../../components';
 import { Container, Content } from './Styles';
 import api from '../../services/api';
 
 export default function ShareFiles() {
   const [uploadedFiles, setUploadedFiles] = useState([]);
-  const socket = useContext(SocketContext);
+  const [socketError, setSocketError] = useState(null);
   const roomName = localStorage.getItem('roomName');
+  const socket = useRef();
+
+  const disconnectSocket = useCallback(() => {
+    socket.current.emit('leave-room');
+    socket.current.off();
+    socket.current.close();
+  }, [socket]);
 
   const filesWithBlobUrls = useCallback(async (files) => {
     if (!files.length) return files;
@@ -33,11 +40,15 @@ export default function ShareFiles() {
   }, []);
 
   useEffect(() => {
-    if (!socket || !roomName) return;
+    socket.current = io();
 
-    socket.emit('join-room', roomName);
+    socket.current.emit('join-room', roomName);
 
-    socket.on('receive-file', (file) => {
+    socket.current.on('connect_error', (err) => {
+      setSocketError(err);
+      disconnectSocket();
+    });
+    socket.current.on('receive-file', (file) => {
       const index = uploadedFiles.findIndex(({ id }) => id === file.id);
 
       if (index !== -1) return;
@@ -47,27 +58,22 @@ export default function ShareFiles() {
       setUploadedFiles((prev) => [...prev, { ...file, preview }]);
       toast('Enviaram um arquivo');
     });
-
-    socket.on('delete-file', (id) => {
+    socket.current.on('delete-file', (id) => {
       setUploadedFiles((prev) => prev.filter((file) => file.id !== id));
       toast('Deletaram um arquivo!');
     });
-
-    socket.on('delete-all-files', () => {
+    socket.current.on('delete-all-files', () => {
       setUploadedFiles([]);
       toast('Deletaram todos os arquivos');
     });
 
-    // eslint-disable-next-line consistent-return
     return () => {
-      socket.emit('leave-room');
-      socket.off();
+      disconnectSocket();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [socket, roomName]);
 
   useEffect(() => {
-    if (!roomName) return;
     const fetchData = async () => {
       try {
         const res = await api.get(`/files?roomName=${roomName}`);
@@ -108,7 +114,7 @@ export default function ShareFiles() {
       loading: 'Deletando arquivos',
       success: () => {
         setUploadedFiles([]);
-        socket.emit('delete-all-files');
+        socket.current.emit('delete-all-files');
         return 'Todos os arquivos deletados com sucesso!';
       },
       error: 'Ocorreu uma falha ao tentar excluir todos os arquivos',
@@ -121,7 +127,7 @@ export default function ShareFiles() {
         loading: 'Deletando arquivo',
         success: () => {
           setUploadedFiles((prev) => prev.filter((file) => file.id !== id));
-          socket.emit('delete-file', id);
+          socket.current.emit('delete-file', id);
           return `Arquivo excluído com sucesso!`;
         },
         error: `Ocorreu um problema ao excluir o arquivo`,
@@ -158,7 +164,7 @@ export default function ShareFiles() {
             id: response.data._id,
             url: response.data.url,
           });
-          socket.emit('send-file', {
+          socket.current.emit('send-file', {
             ...uploadedFile,
             uploaded: true,
             progress: 100,
@@ -198,6 +204,14 @@ export default function ShareFiles() {
     },
     [processUpload]
   );
+
+  if (socketError)
+    return (
+      <>
+        <h1>Ocorreu um problema na conexão com o servidor WebSocket: </h1>
+        <h3>{socketError?.message}</h3>
+      </>
+    );
 
   return (
     <Container>
