@@ -40,7 +40,7 @@ export default function ShareFiles() {
   }, []);
 
   useEffect(() => {
-    socket.current = io();
+    socket.current = io(import.meta.env.VITE_BACKEND_URL);
 
     socket.current.emit('join-room', roomName);
 
