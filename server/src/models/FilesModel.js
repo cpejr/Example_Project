@@ -52,19 +52,21 @@ FileSchema.pre('remove', async function () {
 FileSchema.statics.deleteAll = async function (filter) {
   const files = await this.find(filter).exec();
 
-  files.forEach(async ({ key }) => {
+  const deleteFilesPromises = files.map(({ key }) => {
     const storageType = process.env.STORAGE_TYPE;
     if (storageType === 's3') {
       const bucketParams = { Bucket: process.env.AWS_BUCKET_NAME, Key: key };
-      await storageS3Client.send(new DeleteObjectCommand(bucketParams));
-    } else {
-      const promisifiedUnlink = promisify(fs.unlink);
-      const pathToFile = path.resolve(__dirname, `../../temp/uploads/${key}`);
-      await promisifiedUnlink(pathToFile);
+      return storageS3Client.send(new DeleteObjectCommand(bucketParams));
     }
+
+    const promisifiedUnlink = promisify(fs.unlink);
+    const pathToFile = path.resolve(__dirname, `../../temp/uploads/${key}`);
+    return promisifiedUnlink(pathToFile);
   });
 
+  await Promise.all(deleteFilesPromises);
   await this.deleteMany(filter).exec();
+
   return files;
 };
 

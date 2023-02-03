@@ -53,8 +53,7 @@ export const deleteById = async (req, res, next) => {
   try {
     const { id } = req.params;
 
-    const file = await FileModel.findById(id).exec();
-    await file.remove();
+    const file = await FileModel.findById(id).remove().exec();
 
     return res.status(200).json(file);
   } catch (err) {

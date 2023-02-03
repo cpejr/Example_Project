@@ -27,11 +27,9 @@ export default function Connect() {
           <h3>Nome da Sala</h3>
           <input type="text" ref={roomInput} />
         </FormInput>
-        <FormInput>
-          <Button type="button" onClick={handleClick}>
-            Entrar em uma sala
-          </Button>
-        </FormInput>
+        <Button type="button" onClick={handleClick}>
+          Entrar em uma sala
+        </Button>
       </FormContainer>
     </Container>
   );

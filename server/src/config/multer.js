@@ -1,6 +1,6 @@
 import { fileURLToPath } from 'url';
 import path from 'node:path';
-import crtypto from 'node:crypto';
+import crypto from 'node:crypto';
 import multer from 'multer';
 import multerS3 from 'multer-s3';
 import storageS3Client from './storageS3Client.js';
@@ -14,7 +14,7 @@ const storageTypes = {
       cb(null, path.resolve(__dirname, '../../temp/uploads')),
     filename: (req, file, cb) => {
       const bytesNumber = 16;
-      crtypto.randomBytes(bytesNumber, (err, hash) => {
+      crypto.randomBytes(bytesNumber, (err, hash) => {
         if (err) cb(err);
 
         file.key = `${hash.toString('hex')}-${file.originalname}`;
@@ -30,7 +30,7 @@ const storageTypes = {
     acl: 'public-read',
     key: (req, file, cb) => {
       const bytesNumber = 16;
-      crtypto.randomBytes(bytesNumber, (err, hash) => {
+      crypto.randomBytes(bytesNumber, (err, hash) => {
         if (err) cb(err);
 
         const fileName = `${hash.toString('hex')}-${file.originalname}`;
