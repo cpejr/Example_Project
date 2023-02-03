@@ -71,5 +71,4 @@ FileSchema.statics.deleteAll = async function (filter) {
 };
 
 const FileModel = mongoose.model('files', FileSchema);
-
 export default FileModel;
