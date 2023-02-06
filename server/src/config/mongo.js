@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import logger from './logger.js';
 
 export default function mongoConfig() {
   return new Promise((resolve, reject) => {
@@ -15,6 +16,7 @@ export default function mongoConfig() {
     });
 
     mongoose.connection.once('open', () => {
+      logger.info('✅ Established connection with mongodb');
       resolve();
     });
   });

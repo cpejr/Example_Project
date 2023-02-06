@@ -1,31 +1,27 @@
-import {
-  RouterProvider,
-  createBrowserRouter,
-  createRoutesFromElements,
-  Route,
-  Navigate,
-  Outlet,
-} from 'react-router-dom';
-import { ShareFiles, Connect } from './pages';
+import { disableReactDevTools } from '@fvilers/disable-react-devtools';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
+import Routes from './routes';
 
-function ProtectedRoute() {
-  const roomName = localStorage.getItem('roomName');
-  return roomName ? <Outlet /> : <Navigate to="/" />;
+if (process.env.NODE_ENV === 'production') {
+  disableReactDevTools();
 }
 
-const router = createBrowserRouter(
-  createRoutesFromElements(
-    <Route path="/">
-      <Route index element={<Connect />} />
-      <Route path="share-files" element={<ProtectedRoute />}>
-        <Route index element={<ShareFiles />} />
-      </Route>
-    </Route>
-  )
-);
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: false,
+    },
+  },
+});
 
 function App() {
-  return <RouterProvider router={router} />;
+  return (
+    <QueryClientProvider client={queryClient}>
+      <Routes />;
+      <ReactQueryDevtools />
+    </QueryClientProvider>
+  );
 }
 
 export default App;

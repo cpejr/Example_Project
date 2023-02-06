@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import multer from 'multer';
-import { multerConfig, multerFileName } from '../config/multer.js';
-import * as FilesController from '../controllers/FilesContoller.js';
+import { multerConfig, multerFileName } from '../../config/multer.js';
+import * as FilesController from '../../controllers/FilesContoller.js';
 
 const FilesRoutes = Router();
 FilesRoutes.get('/', FilesController.getAll);

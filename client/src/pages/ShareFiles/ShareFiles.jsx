@@ -1,24 +1,15 @@
 import axios from 'axios';
-import { io } from 'socket.io-client';
 import toast, { Toaster } from 'react-hot-toast';
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { uniqueId } from 'lodash';
 import { filesize } from 'filesize';
-import { Upload, FileList } from '../../components';
+import { Upload, FileList } from '../../components/features';
 import { Container, Content } from './Styles';
-import api from '../../services/api';
+import httpClient from '../../services/api/httpClient';
 
 export default function ShareFiles() {
   const [uploadedFiles, setUploadedFiles] = useState([]);
-  const [socketError, setSocketError] = useState(null);
   const roomName = localStorage.getItem('roomName');
-  const socket = useRef();
-
-  const disconnectSocket = useCallback(() => {
-    socket.current.emit('leave-room');
-    socket.current.off();
-    socket.current.close();
-  }, [socket]);
 
   const filesWithBlobUrls = useCallback(async (files) => {
     if (!files.length) return files;
@@ -40,43 +31,9 @@ export default function ShareFiles() {
   }, []);
 
   useEffect(() => {
-    socket.current = io(import.meta.env.VITE_BACKEND_URL);
-
-    socket.current.emit('join-room', roomName);
-
-    socket.current.on('connect_error', (err) => {
-      setSocketError(err);
-      disconnectSocket();
-    });
-    socket.current.on('receive-file', (file) => {
-      const index = uploadedFiles.findIndex(({ id }) => id === file.id);
-
-      if (index !== -1) return;
-
-      const blob = new Blob([file.file], { type: file.type });
-      const preview = URL.createObjectURL(blob);
-      setUploadedFiles((prev) => [...prev, { ...file, preview }]);
-      toast('Enviaram um arquivo');
-    });
-    socket.current.on('delete-file', (id) => {
-      setUploadedFiles((prev) => prev.filter((file) => file.id !== id));
-      toast('Deletaram um arquivo!');
-    });
-    socket.current.on('delete-all-files', () => {
-      setUploadedFiles([]);
-      toast('Deletaram todos os arquivos');
-    });
-
-    return () => {
-      disconnectSocket();
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [socket, roomName]);
-
-  useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await api.get(`/files?roomName=${roomName}`);
+        const res = await httpClient.get(`/files?roomName=${roomName}`);
         const files = await filesWithBlobUrls(res.data);
         const filesData = files.map((file) => ({
           file,
@@ -110,31 +67,26 @@ export default function ShareFiles() {
   }, [filesWithBlobUrls, roomName]);
 
   const handleDeleteAll = useCallback(async () => {
-    return toast.promise(api.delete(`/files?roomName=${roomName}`), {
+    return toast.promise(httpClient.delete(`/files?roomName=${roomName}`), {
       loading: 'Deletando arquivos',
       success: () => {
         setUploadedFiles([]);
-        socket.current.emit('delete-all-files');
         return 'Todos os arquivos deletados com sucesso!';
       },
       error: 'Ocorreu uma falha ao tentar excluir todos os arquivos',
     });
-  }, [socket, roomName]);
+  }, [roomName]);
 
-  const handleDelete = useCallback(
-    async (id) => {
-      return toast.promise(api.delete(`/files/${id}`), {
-        loading: 'Deletando arquivo',
-        success: () => {
-          setUploadedFiles((prev) => prev.filter((file) => file.id !== id));
-          socket.current.emit('delete-file', id);
-          return `Arquivo excluído com sucesso!`;
-        },
-        error: `Ocorreu um problema ao excluir o arquivo`,
-      });
-    },
-    [socket]
-  );
+  const handleDelete = useCallback(async (id) => {
+    return toast.promise(httpClient.delete(`/files/${id}`), {
+      loading: 'Deletando arquivo',
+      success: () => {
+        setUploadedFiles((prev) => prev.filter((file) => file.id !== id));
+        return `Arquivo excluído com sucesso!`;
+      },
+      error: `Ocorreu um problema ao excluir o arquivo`,
+    });
+  }, []);
 
   const updateFile = useCallback((id, data) => {
     setUploadedFiles((prev) =>
@@ -149,7 +101,7 @@ export default function ShareFiles() {
         data.append('file', uploadedFile.file, uploadedFile.name);
       }
 
-      api
+      httpClient
         .post(`/files?roomName=${roomName}`, data, {
           onUploadProgress: ({ loaded, total }) => {
             const progress = Math.round((loaded * 100) / total);
@@ -164,14 +116,6 @@ export default function ShareFiles() {
             id: response.data._id,
             url: response.data.url,
           });
-          socket.current.emit('send-file', {
-            ...uploadedFile,
-            uploaded: true,
-            progress: 100,
-            // eslint-disable-next-line no-underscore-dangle
-            id: response.data._id,
-            url: response.data.url,
-          });
         })
         .catch((err) => {
           console.error(err);
@@ -181,7 +125,7 @@ export default function ShareFiles() {
           });
         });
     },
-    [updateFile, socket, roomName]
+    [updateFile, roomName]
   );
 
   const handleUpload = useCallback(
@@ -204,14 +148,6 @@ export default function ShareFiles() {
     },
     [processUpload]
   );
-
-  if (socketError)
-    return (
-      <>
-        <h1>Ocorreu um problema na conexão com o servidor WebSocket: </h1>
-        <h3>{socketError?.message}</h3>
-      </>
-    );
 
   return (
     <Container>
