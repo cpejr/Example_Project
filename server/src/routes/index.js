@@ -7,6 +7,6 @@ const routes = express.Router();
 
 routes.use('/users', UsersRoutes);
 routes.use('/files', FilesRoutes);
-routes.use('/sessions', SessionsRoutes);
+routes.use('/', SessionsRoutes);
 
 export default routes;

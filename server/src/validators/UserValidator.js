@@ -20,11 +20,11 @@ export const createUserValidator = z
           .string({ required_error: 'Email is required' })
           .email('Must be a valida email'),
         cpf: z.string({ required_error: 'CPF is required' }),
-        role: z
-          .nativeEnum(ROLES_LIST, {
-            errorMap: () => ({ message: 'Invalid permission code' }),
-          })
-          .default(ROLES_LIST.USER),
+        roles: z
+          .number({ required_error: 'Roles are required' })
+          .positive()
+          .int()
+          .array(),
       })
       .refine((data) => data.password === data.confirmPassword, {
         path: ['confirmPassword'],

@@ -5,15 +5,15 @@ import authClient from '../services/api/authClient';
 const useAuthStore = create((set) => ({
   auth: null,
   refresh: async () => {
-    const { accessToken } = (await authClient.get('/sessions/refresh')).data;
-    const { userId, role } = jwtDecode(accessToken);
+    const { accessToken } = (await authClient.get('/refresh')).data;
+    const { userId, roles } = jwtDecode(accessToken);
 
     set((state) => ({
       auth: {
         ...state.auth,
         accessToken,
         userId,
-        role,
+        roles,
       },
     }));
 
@@ -21,18 +21,18 @@ const useAuthStore = create((set) => ({
   },
   login: async ({ email, password, rememberMe }) => {
     const { accessToken } = (
-      await authClient.post('/sessions/login', {
+      await authClient.post('/login', {
         email,
         password,
         rememberMe,
       })
     ).data;
-    const { userId, role } = jwtDecode(accessToken);
+    const { userId, roles } = jwtDecode(accessToken);
 
-    set({ auth: { accessToken, userId, role } });
+    set({ auth: { accessToken, userId, roles } });
   },
   logout: async (afterLogout = () => {}) => {
-    await authClient.post('/sessions/logout');
+    await authClient.post('/logout');
 
     afterLogout();
 

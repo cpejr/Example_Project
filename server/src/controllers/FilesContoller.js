@@ -1,5 +1,5 @@
 import { multerFileName } from '../config/multer.js';
-import FileModel from '../models/FilesModel.js';
+import FileModel from '../models/FileModel.js';
 
 export const create = async (req, res, next) => {
   try {
@@ -7,6 +7,7 @@ export const create = async (req, res, next) => {
       originalname: name,
       size,
       key,
+      mimetype: mimeType,
       location: url = '',
     } = req[multerFileName];
 
@@ -14,11 +15,12 @@ export const create = async (req, res, next) => {
     const { roomName } = req.query;
 
     const file = await FileModel.create({
+      roomName,
       name: formatedName,
       size,
       key,
+      mimeType,
       url,
-      roomName,
     });
     return res.status(200).json(file);
   } catch (err) {

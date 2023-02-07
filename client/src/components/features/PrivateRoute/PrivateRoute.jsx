@@ -3,14 +3,15 @@ import jwtDecode from 'jwt-decode';
 import useAuthStore from '../../../store/auth';
 import ROLES_LIST from '../../../utils/rolesList';
 
-export default function PrivateRoute() {
+export default function PrivateRoute({ allowedRoles = [ROLES_LIST.USER] }) {
   const { auth } = useAuthStore();
   const location = useLocation();
 
   const decoded = auth?.accessToken && jwtDecode(auth.accessToken);
-  const role = decoded?.role || '';
+  const roles = decoded?.roles || [];
+  const isAllowed = roles.some((role) => allowedRoles.includes(role));
 
-  if (role === ROLES_LIST.ADMIN) return <Outlet />;
+  if (isAllowed) return <Outlet />;
   if (auth?.accessToken)
     <Navigate to="/unauthorized" state={{ from: location }} replace />;
 

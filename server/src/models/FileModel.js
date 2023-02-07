@@ -23,6 +23,11 @@ const FileSchema = new mongoose.Schema(
     key: {
       type: String,
       required: true,
+      unique: true,
+    },
+    mimeType: {
+      type: String,
+      required: true,
     },
     url: {
       type: String,
@@ -37,7 +42,7 @@ FileSchema.pre('save', function () {
   }
 });
 
-FileSchema.pre('remove', async function () {
+FileSchema.pre('rnameemove', async function () {
   const storageType = process.env.STORAGE_TYPE;
   if (storageType === 's3') {
     const bucketParams = { Bucket: process.env.AWS_BUCKET_NAME, Key: this.key };
@@ -70,5 +75,5 @@ FileSchema.statics.deleteAll = async function (filter) {
   return files;
 };
 
-const FileModel = mongoose.model('files', FileSchema);
+const FileModel = mongoose.model('File', FileSchema);
 export default FileModel;

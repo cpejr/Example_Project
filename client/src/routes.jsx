@@ -10,6 +10,7 @@ import { ShareFiles, Connect, Register, Login } from './pages';
 import Home from './pages/Home/Home';
 import Missing from './pages/Missing/Missing';
 import Unauthorized from './pages/Unauthorized/Unauthorized';
+import ROLES_LIST from './utils/rolesList';
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -18,9 +19,11 @@ const router = createBrowserRouter(
       <Route path="/login" element={<Login />} />
       <Route path="/unauthorized" element={<Unauthorized />} />
       <Route element={<PersistLogin />}>
+        <Route element={<PrivateRoute allowedRoles={[ROLES_LIST.ADMIN]} />}>
+          <Route path="/connect" element={<Connect />} />
+        </Route>
         <Route element={<PrivateRoute />}>
           <Route path="home" element={<Home />} />
-          <Route path="/connect" element={<Connect />} />
           <Route path="/share-files" element={<ShareFiles />} />
         </Route>
         <Route path="/register" element={<Register />} />

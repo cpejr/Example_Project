@@ -2,6 +2,7 @@ import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 // import InputMask from 'react-input-mask';
 import { z } from 'zod';
+import { useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { Container, Form } from './Styles';
 import { cpfMask } from '../../utils/inputMasks';
@@ -27,11 +28,8 @@ const validationSchema = z
     confirmPassword: z
       .string()
       .min(1, { message: 'Confirm Password is required' }),
-    role: z
-      .nativeEnum(ROLES_LIST, {
-        errorMap: () => ({ message: 'Invalid permission code' }),
-      })
-      .default(ROLES_LIST.USER),
+    hasAdmin: z.boolean().optional().default(false),
+    hasEditor: z.boolean().optional().default(false),
   })
   .refine((data) => data.password === data.confirmPassword, {
     path: ['confirmPassword'],
@@ -48,10 +46,22 @@ export default function Register() {
   } = useForm({
     resolver: zodResolver(validationSchema),
   });
-  const hasAdminPermission = auth?.role === ROLES_LIST.ADMIN;
+
+  const hasAdminPermission = useMemo(
+    () => auth?.roles.includes(ROLES_LIST.ADMIN),
+    [auth]
+  );
 
   const { mutate: createUser, error, isLoading } = UseCreateUser();
-  const onSubmit = (data) => createUser(data);
+  const onSubmit = (data) => {
+    const { hasAdmin, hasEditor, ...newUser } = data;
+    const roles = [ROLES_LIST.USER];
+
+    if (hasAdmin) roles.push(ROLES_LIST.ADMIN);
+    if (hasEditor) roles.push(ROLES_LIST.EDITOR);
+
+    createUser({ ...newUser, roles });
+  };
 
   if (isLoading) return <p>Loading...</p>;
   if (error) return <p>{error.message}</p>;
@@ -123,17 +133,29 @@ export default function Register() {
         </div>
 
         {hasAdminPermission ? (
-          <div>
-            <label htmlFor="role">Giver permission code</label>
-            <input
-              id="role"
-              name="role"
-              type="password"
-              {...register('role', { valueAsNumber: true })}
-            />
-            <p>{errors.role?.message}</p>
-          </div>
+          <>
+            <div>
+              <label htmlFor="hasAdmin">Give admin privileges</label>
+              <input
+                id="hasAdmin"
+                name="hasAdmin"
+                type="checkbox"
+                {...register('hasAdmin')}
+              />
+            </div>
+
+            <div>
+              <label htmlFor="hasEditor">Give editor privileges</label>
+              <input
+                id="hasEditor"
+                name="hasEditor"
+                type="checkbox"
+                {...register('hasEditor')}
+              />
+            </div>
+          </>
         ) : null}
+
         <p style={{ color: 'white' }}>
           Already registered?
           <br />

@@ -1,6 +1,5 @@
 import mongoose from 'mongoose';
 import bcrypt from 'bcrypt';
-import ROLES_LIST from '../config/rolesList.js';
 
 const userSchema = new mongoose.Schema(
   {
@@ -24,9 +23,9 @@ const userSchema = new mongoose.Schema(
       require: true,
       unique: true,
     },
-    role: {
-      type: Number,
-      default: ROLES_LIST.USER,
+    roles: {
+      type: [Number],
+      required: true,
     },
   },
   { timestamps: true }
@@ -34,13 +33,13 @@ const userSchema = new mongoose.Schema(
 
 userSchema.pre('save', function (next) {
   const user = this;
-  const saltFactor = 10;
+  const SALT_FACTOR = 10;
 
   // only hash the password if it has been modified (or is new)
   if (!user.isModified('password')) return next();
 
   // generate a salt
-  bcrypt.genSalt(saltFactor, (err, salt) => {
+  bcrypt.genSalt(SALT_FACTOR, (err, salt) => {
     if (err) return next(err);
 
     // hash the password using our new salt

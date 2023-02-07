@@ -1,6 +1,6 @@
-import UserModel from '../models/UsersModel.js';
+import UserModel from '../models/UserModel.js';
 import asyncHandler from '../utils/asyncHandler.js';
-import { createUserValidator } from '../validators/UsersValidator.js';
+import { createUserValidator } from '../validators/UserValidator.js';
 
 export const create = asyncHandler(async (req, res, next) => {
   const { confirmPassword, ...newUser } = createUserValidator.parse(req);

@@ -1,11 +1,10 @@
-import ROLES_LIST from '../config/rolesList.js';
 import ForbiddenError from '../errors/ForbiddenError/ForbiddenError.js';
 
-const verifyAdmin = () => {
+const verifyAdmin = (...allowedRoles) => {
   return (req, res, next) => {
-    if (!req?.role) throw new ForbiddenError('Access denied');
+    if (!req?.roles) throw new ForbiddenError('Access denied');
 
-    const isAllowed = req.role === ROLES_LIST.ADMIN;
+    const isAllowed = req.roles.some((role) => allowedRoles.includes(role));
     if (!isAllowed) throw new ForbiddenError('Access denied');
 
     next();

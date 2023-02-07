@@ -1,11 +1,11 @@
 import jwt from 'jsonwebtoken';
 import formatExpiresAt from '../utils/formatExpiresAt.js';
 import asyncHandler from '../utils/asyncHandler.js';
-import UserModel from '../models/UsersModel.js';
+import UserModel from '../models/UserModel.js';
 import UserTokenModel from '../models/UserTokenModel.js';
 import UnauthorizedError from '../errors/UnauthorizedError/UnauthorizedError.js';
 import ForbiddenError from '../errors/ForbiddenError/ForbiddenError.js';
-import { loginValidator } from '../validators/sessionsValidator.js';
+import { loginValidator } from '../validators/SessionValidator.js';
 
 export const handleLogin = asyncHandler(async (req, res) => {
   const { email, password, rememberMe } = loginValidator.parse(req);
@@ -42,7 +42,7 @@ export const handleLogin = asyncHandler(async (req, res) => {
   const accessToken = jwt.sign(
     {
       userId: foundUser._id,
-      role: foundUser.role,
+      roles: foundUser.roles,
     },
     process.env.ACCESS_TOKEN_SECRET,
     { expiresIn: +process.env.ACCESS_TOKEN_EXPIRE } // in seconds
@@ -89,14 +89,14 @@ export const handleRefreshToken = asyncHandler(async (req, res) => {
 
   if (!foundToken) {
     console.log('HACKEEEEED');
-    const hackedUser = await User.findOne({
+    const hackedUser = await UserModel.findOne({
       _id: decoded.userId,
     }).exec();
     await UserTokenModel.deleteMany({ user: hackedUser._id }).exec();
     throw new ForbiddenError('Token reuse');
   }
   const userId = foundToken.user._id.toString();
-  const role = foundToken.user.role;
+  const roles = foundToken.user.roles;
 
   if (userId !== decoded.userId) throw new ForbiddenError('Tampered token');
 
@@ -108,7 +108,7 @@ export const handleRefreshToken = asyncHandler(async (req, res) => {
   const accessToken = jwt.sign(
     {
       userId,
-      role,
+      roles,
     },
     process.env.ACCESS_TOKEN_SECRET,
     { expiresIn: +process.env.ACCESS_TOKEN_EXPIRE } // in seconds
