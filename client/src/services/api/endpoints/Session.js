@@ -1,5 +1,5 @@
 import axios from 'axios';
-import useAuthStore2 from '../../../store/auth2';
+import useAuthStore from '../../../store/auth';
 
 // Necessário para impedir cycling de importações
 const BASE_URL = `${import.meta.env.VITE_APP_URL}/api`;
@@ -9,7 +9,7 @@ const sessionApi = axios.create({
 });
 
 export async function login({ email, password, rememberMe }) {
-  const { setAuth } = useAuthStore2.getState();
+  const { setAuth } = useAuthStore.getState();
   const { data } = await sessionApi.post('/login', {
     email,
     password,
@@ -22,15 +22,15 @@ export async function login({ email, password, rememberMe }) {
 }
 
 export async function logout() {
-  const { clearAuth } = useAuthStore2.getState();
+  const { clearAuth } = useAuthStore.getState();
   await sessionApi.post('/logout');
 
   clearAuth();
 }
 
 export async function refresh() {
-  const { setAuth } = useAuthStore2.getState();
-  const { data } = await sessionApi.post('/refresh');
+  const { setAuth } = useAuthStore.getState();
+  const { data } = await sessionApi.get('/refresh');
 
   setAuth(data.accessToken);
 

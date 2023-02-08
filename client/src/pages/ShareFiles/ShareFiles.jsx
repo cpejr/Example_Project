@@ -5,7 +5,7 @@ import { uniqueId } from 'lodash';
 import { filesize } from 'filesize';
 import { Upload, FileList } from '../../components/features';
 import { Container, Content } from './Styles';
-import httpClient from '../../services/api/httpClient';
+import api from '../../services/api/api';
 
 export default function ShareFiles() {
   const [uploadedFiles, setUploadedFiles] = useState([]);
@@ -33,7 +33,7 @@ export default function ShareFiles() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await httpClient.get(`/files?roomName=${roomName}`);
+        const res = await api.get(`/files?roomName=${roomName}`);
         const files = await filesWithBlobUrls(res.data);
         const filesData = files.map((file) => ({
           file,
@@ -67,7 +67,7 @@ export default function ShareFiles() {
   }, [filesWithBlobUrls, roomName]);
 
   const handleDeleteAll = useCallback(async () => {
-    return toast.promise(httpClient.delete(`/files?roomName=${roomName}`), {
+    return toast.promise(api.delete(`/files?roomName=${roomName}`), {
       loading: 'Deletando arquivos',
       success: () => {
         setUploadedFiles([]);
@@ -78,7 +78,7 @@ export default function ShareFiles() {
   }, [roomName]);
 
   const handleDelete = useCallback(async (id) => {
-    return toast.promise(httpClient.delete(`/files/${id}`), {
+    return toast.promise(api.delete(`/files/${id}`), {
       loading: 'Deletando arquivo',
       success: () => {
         setUploadedFiles((prev) => prev.filter((file) => file.id !== id));
@@ -101,7 +101,7 @@ export default function ShareFiles() {
         data.append('file', uploadedFile.file, uploadedFile.name);
       }
 
-      httpClient
+      api
         .post(`/files?roomName=${roomName}`, data, {
           onUploadProgress: ({ loaded, total }) => {
             const progress = Math.round((loaded * 100) / total);

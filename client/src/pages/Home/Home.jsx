@@ -3,15 +3,9 @@ import { useLogout } from '../../hooks/query/sessionQuery';
 
 function Home() {
   const navigate = useNavigate();
-  const { mutateAsync: logout } = useLogout();
-
-  const signOut = async () => {
-    try {
-      await logout(() => navigate('/login'));
-    } catch (err) {
-      console.error(err);
-    }
-  };
+  const { mutate: logout } = useLogout({
+    onSuccess: () => navigate('/login'),
+  });
 
   return (
     <section>
@@ -29,7 +23,7 @@ function Home() {
       <br />
       <Link to="/linkpage">Go to the link page</Link>
       <div className="flexGrow">
-        <button type="button" onClick={signOut}>
+        <button type="button" onClick={logout}>
           Sign Out
         </button>
       </div>

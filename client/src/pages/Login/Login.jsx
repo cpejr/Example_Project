@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { Link } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useLogin } from '../../hooks/query/sessionQuery';
@@ -26,7 +26,17 @@ export default function Login() {
     resolver: zodResolver(validationSchema),
   });
 
-  const { mutate: login, error, isLoading } = useLogin();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const from = location.state?.from?.pathname || '/';
+
+  const {
+    mutate: login,
+    error,
+    isLoading,
+  } = useLogin({
+    onSuccess: () => navigate(from, { replace: true }),
+  });
   const onSubmit = (data) => login(data);
 
   if (isLoading) return <p>Loading...</p>;

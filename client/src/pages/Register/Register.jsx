@@ -3,7 +3,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 // import InputMask from 'react-input-mask';
 import { z } from 'zod';
 import { useMemo } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Container, Form } from './Styles';
 import { cpfMask } from '../../utils/inputMasks';
 import { UseCreateUser } from '../../hooks/query/userQuery';
@@ -37,6 +37,8 @@ const validationSchema = z
   });
 
 export default function Register() {
+  const navigate = useNavigate();
+  const location = useLocation();
   const { auth } = useAuthStore();
   const {
     register,
@@ -46,13 +48,20 @@ export default function Register() {
   } = useForm({
     resolver: zodResolver(validationSchema),
   });
+  const {
+    mutate: createUser,
+    error,
+    isLoading,
+  } = UseCreateUser({
+    onSuccess: () =>
+      navigate('/', { state: { from: location }, replace: true }),
+  });
 
   const hasAdminPermission = useMemo(
     () => auth?.roles.includes(ROLES_LIST.ADMIN),
     [auth]
   );
 
-  const { mutate: createUser, error, isLoading } = UseCreateUser();
   const onSubmit = (data) => {
     const { hasAdmin, hasEditor, ...newUser } = data;
     const roles = [ROLES_LIST.USER];

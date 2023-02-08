@@ -1,37 +1,41 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { login, logout, refresh } from '../../services/api/endpoints/Session';
 import useAuthStore from '../../store/auth';
 
-export function useLogin() {
-  const { login } = useAuthStore();
-  const navigate = useNavigate();
-  const location = useLocation();
-  const from = location.state?.from?.pathname || '/';
-
+export function useLogin({
+  onSuccess = () => {},
+  onError = (err) => console.error(err),
+}) {
   return useMutation({
     mutationFn: ({ email, password, rememberMe }) =>
       login({ email, password, rememberMe }),
-    onError: (err) => console.error(err),
-    onSuccess: () => navigate(from, { replace: true }),
+    onError,
+    onSuccess,
   });
 }
 
-export function useLogout() {
-  const { logout } = useAuthStore();
-
+export function useLogout({
+  onSuccess = () => {},
+  onError = (err) => console.error(err),
+}) {
   return useMutation({
-    mutationFn: (afterLogout) => logout(afterLogout),
-    onError: (err) => console.error(err),
+    mutationFn: logout,
+    onError,
+    onSuccess,
   });
 }
 
-export function useRefreshToken() {
-  const { auth, refresh } = useAuthStore();
+export function useRefreshToken({
+  onSuccess = () => {},
+  onError = (err) => console.error(err),
+}) {
+  const { auth } = useAuthStore();
 
   return useQuery({
-    queryKey: ['persist'],
+    queryKey: ['refresh'],
     queryFn: refresh,
-    onError: (err) => console.error(err),
+    onError,
+    onSuccess,
     enabled: !auth?.accessToken,
   });
 }

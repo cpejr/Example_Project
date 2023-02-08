@@ -1,6 +1,6 @@
 import api from '../api';
 
-export async function get(filters = {}) {
+export async function get(filters) {
   const { data } = await api.get('/users', { params: filters });
 
   return data;

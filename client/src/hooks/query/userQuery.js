@@ -1,33 +1,25 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { useLocation, useNavigate } from 'react-router-dom';
-import httpClient from '../../services/api/httpClient';
-import queryOptimisticUpdate from '../../utils/queryOptimisticUpdate';
+import { useMutation, useQuery } from '@tanstack/react-query';
+import * as UserApi from '../../services/api/endpoints/User';
 
-export function UseCreateUser() {
-  const queryClient = useQueryClient();
-  const navigate = useNavigate();
-  const location = useLocation();
-
+export function UseCreateUser({
+  onSuccess = () => {},
+  onError = (err) => console.error(err),
+}) {
   return useMutation({
-    mutationFn: async (inputs) =>
-      (await httpClient.post('/users', inputs)).data,
-    ...queryOptimisticUpdate({ queryClient, key: ['users'] }),
-    onSuccess: () =>
-      navigate('/', { state: { from: location }, replace: true }),
+    mutationFn: (inputs) => UserApi.create(inputs),
+    onSuccess,
+    onError,
   });
 }
 
-export function useGetUsers() {
-  const navigate = useNavigate();
-  const location = useLocation();
-
+export function useGetUsers({
+  onSuccess = () => {},
+  onError = (err) => console.error(err),
+}) {
   return useQuery({
     queryKey: ['users'],
-    queryFn: async (filters = {}) =>
-      (await httpClient.get('/users', { params: filters })).data,
-    onError: (err) => {
-      console.error(err);
-      navigate('/login', { state: { from: location }, replace: true });
-    },
+    queryFn: (filters = {}) => UserApi.get(filters),
+    onSuccess,
+    onError,
   });
 }

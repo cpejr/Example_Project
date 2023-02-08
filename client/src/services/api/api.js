@@ -31,7 +31,7 @@ api.interceptors.response.use(
 
     // Se não for forbidden ou se a requisição já foi reenviada
     if (!isForbiddenError || prevRequest?.sent) return Promise.reject(error);
-
+    console.log('UEEEEEE');
     const newAccessToken = await refresh();
 
     prevRequest.sent = true;
