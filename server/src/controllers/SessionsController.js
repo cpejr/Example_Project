@@ -5,7 +5,7 @@ import UserModel from '../models/UsersModel.js';
 import UserTokenModel from '../models/UserTokenModel.js';
 import UnauthorizedError from '../errors/UnauthorizedError/UnauthorizedError.js';
 import ForbiddenError from '../errors/ForbiddenError/ForbiddenError.js';
-import { loginValidator } from '../validators/sessionsValidator.js';
+import { loginValidator } from '../validators/SessionsValidator.js';
 
 export const handleLogin = asyncHandler(async (req, res) => {
   const { email, password, rememberMe } = loginValidator.parse(req);
