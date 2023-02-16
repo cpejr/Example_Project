@@ -17,6 +17,7 @@ export async function login({ email, password, rememberMe }) {
   });
 
   setAuth(data.accessToken);
+  localStorage.setItem('isLoggedIn', 'true');
 
   return data;
 }
@@ -26,6 +27,7 @@ export async function logout() {
   await sessionApi.post('/logout');
 
   clearAuth();
+  localStorage.removeItem('isLoggedIn');
 }
 
 export async function refresh() {

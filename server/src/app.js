@@ -5,11 +5,10 @@ import cors from 'cors';
 import morgan from 'morgan';
 import helmet from 'helmet';
 import cookieParser from 'cookie-parser';
-import errorHandler from './middleware/errorHandler.js';
+import errorHandler from './middlewares/errorHandler.js';
 import corsOptions from './config/corsOptions.js';
-import { ERROR_CODES } from './errors/errorConstants.js';
-import logger from './config/logger.js';
 import routes from './routes/index.js';
+import { ERROR_CODES } from './errors/BaseErrors.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -28,7 +27,9 @@ app.use(helmet());
 if (isDevEnvironment) app.use(morgan('dev'));
 
 // Principal routes
-app.use('/api', routes);
+app.use('/api', (req, res) => {
+  req.params;
+});
 
 // Auxiliary routes
 app.use('/files', express.static(path.resolve(__dirname, '../temp/uploads')));
@@ -42,10 +43,5 @@ app.use(
   (req, res, next) =>
     res.sendFile(path.join(__dirname, '../../client/dist/index.html')) // Não necessário para outros projetos
 );
-
-process.on('unhandledRejection', (err) => {
-  logger.error('Unhandled rejection', err);
-  process.exit(1);
-});
 
 export default app;

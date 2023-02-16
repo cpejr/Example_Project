@@ -17,3 +17,8 @@ app.listen(PORT, async () => {
     logger.error(err.message, err);
   }
 });
+
+process.on('unhandledRejection', (err) => {
+  logger.error('Unhandled rejection', err);
+  process.exit(1);
+});

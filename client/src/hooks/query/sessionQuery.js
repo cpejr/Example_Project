@@ -30,12 +30,12 @@ export function useRefreshToken({
   onError = (err) => console.error(err),
 }) {
   const { auth } = useAuthStore();
-
+  const isLoggedIn = !!localStorage.getItem('isLoggedIn');
   return useQuery({
     queryKey: ['refresh'],
     queryFn: refresh,
     onError,
     onSuccess,
-    enabled: !auth?.accessToken,
+    enabled: isLoggedIn && !auth?.accessToken,
   });
 }

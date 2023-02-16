@@ -58,7 +58,7 @@ export default function Register() {
   });
 
   const hasAdminPermission = useMemo(
-    () => auth?.roles.includes(ROLES_LIST.ADMIN),
+    () => auth?.roles?.includes(ROLES_LIST.ADMIN),
     [auth]
   );
 

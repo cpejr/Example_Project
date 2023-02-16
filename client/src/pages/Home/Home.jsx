@@ -3,9 +3,7 @@ import { useLogout } from '../../hooks/query/sessionQuery';
 
 function Home() {
   const navigate = useNavigate();
-  const { mutate: logout } = useLogout({
-    onSuccess: () => navigate('/login'),
-  });
+  const { mutate: logout } = useLogout({ onSuccess: () => navigate('/login') });
 
   return (
     <section>

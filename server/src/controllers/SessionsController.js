@@ -3,9 +3,8 @@ import formatExpiresAt from '../utils/formatExpiresAt.js';
 import asyncHandler from '../utils/asyncHandler.js';
 import UserModel from '../models/UserModel.js';
 import UserTokenModel from '../models/UserTokenModel.js';
-import UnauthorizedError from '../errors/UnauthorizedError/UnauthorizedError.js';
-import ForbiddenError from '../errors/ForbiddenError/ForbiddenError.js';
 import { loginValidator } from '../validators/SessionValidator.js';
+import { ForbiddenError, UnauthorizedError } from '../errors/BaseErrors.js';
 
 export const handleLogin = asyncHandler(async (req, res) => {
   const { email, password, rememberMe } = loginValidator.parse(req);
